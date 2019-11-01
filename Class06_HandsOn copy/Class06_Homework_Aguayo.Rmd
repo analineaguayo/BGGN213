@@ -1,0 +1,137 @@
+---
+title: "Class 06 Homework"
+author: "Analine Aguayo"
+date: "10/31/2019"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# Can you improve this analysis code?
+library(bio3d)
+s1 <- read.pdb("3CIG")  # kinase with drug
+s2 <- read.pdb("1AKE")  # kinase no drug
+s3 <- read.pdb("1E4Y")  # kinase with drug
+ 
+
+s1.chainA <- trim.pdb(s1, chain="A", elety="CA")
+s2.chainA <- trim.pdb(s2, chain="A", elety="CA")
+s3.chainA <- trim.pdb(s1, chain="A", elety="CA")
+
+s1.b <- s1.chainA$atom$b
+s2.b <- s2.chainA$atom$b
+s3.b <- s3.chainA$atom$b
+
+plotb3(s1.b, sse=s1.chainA, typ="l", ylab="Bfactor") 
+plotb3(s2.b, sse=s2.chainA, typ="l", ylab="Bfactor") 
+plotb3(s3.b, sse=s3.chainA, typ="l", ylab="Bfactor")
+```
+
+```{r}
+#Understanding what the part does with only one of the proteins
+library(bio3d)
+s1 <- read.pdb("4AKE")  # kinase with drug
+s1.chainA <- trim.pdb(s1, chain="A", elety="CA")
+s1.b <- s1.chainA$atom$b
+plotb3(s1.b, sse=s1.chainA, typ="l", ylab="Bfactor") 
+#it appears as if this function gives you the Bfactor (whatever that is) of each residue along the length of a specific protein 4AKE
+
+```
+
+```{r}
+library(bio3d)
+#this appears to load the plugin named bio3d
+#in other words I think it lets you access the database
+```
+
+```{r}
+s1 <- read.pdb("4AKE")
+s1
+
+#s1 seems to make r read the pdb file for 4AKE
+#this will be an important part to manipulate when we want to look at different proteins
+#maybe we can just sub in a variable for 4AKE?
+```
+
+```{r}
+s1.chainA <- trim.pdb(s1, chain="A", elety="CA")
+s1.chainA
+#the previous pdb file states that there were two chains in the 4AKE protein.
+#i think this command makes you show only the A chain.
+#do we know what elety is?
+#http://thegrantlab.org/bio3d/html/read.pdb.html
+#the link above shows me that elety means "atom type"
+#there are options of C, N, CA, and N
+
+```
+
+```{r}
+s1.b <- s1.chainA$atom$b
+s1.b
+#this looks like it printed out some values from each of the residues
+#these residues are the ones that are in the A chain
+#there are 214 residues in this chain compared to 3312 from the whole protein
+#bfactor is the possibility of the alpha carbons' positions
+#I think that a high bfactor means that the possibility of where a particular alpha carbon is high?
+```
+```{r}
+plotb3(s3.b, sse=s3.chainA, typ="l", ylab="Bfactor")
+```
+
+```{r}
+plotb3(s1.b, sse=s1.chainA, typ="l", ylab="Bfactor")
+plotb3
+#this is a plot of s1.b
+#sse seems to be the name of what we are plotting
+#type is the kind of graph that we are plotting
+#and ylab is the value for the y axis label
+#i do not know what the b3 part of the plot is.....
+?plot
+
+#sse looks like it adds the secondary structure objects (the boxes above and below the chart)
+# type l is for line graph
+#and ylab is the y axis label
+
+```
+
+
+
+
+```{r}
+library(bio3d)
+Bfactor_graph <- function(x) {
+  #reads the appropriate pdb file (of the protein of your choice)
+  x.a <- read.pdb(x)
+  #trims the protein to be only the A chain with alpha Carbons displayed
+  x.chainA <- trim.pdb(x.a, chain="A", elety="CA")
+  #chooses apropriate atoms as before and their bfactors
+  x.b <- x.chainA$atom$b
+  #makes the scatter plot out of selected information, I changed the color of the line.
+  plotb3(x.b, sse=x.chainA,typ="l", ylab="Bfactor", col = "aquamarine4")
+}
+
+#i will change the x to a random protein the postdoc in my lab worked on
+x <- "3CIG"
+Bfactor_graph(x)
+#any other protein can be inputted into x to run now, I think.... let's try again
+
+```
+
+```{r}
+#trying again with another random protein
+library(bio3d)
+Bfactor_graph <- function(x) {
+  x.a <- read.pdb(x)
+  x.chainA <- trim.pdb(x.a, chain="A", elety="CA")
+  x.b <- x.chainA$atom$b
+  plotb3(x.b, sse=x.chainA,typ="l", ylab="Bfactor", col = "aquamarine4")
+}
+
+x <- "2B3B"
+Bfactor_graph(x)
+
+```
+
