@@ -61,6 +61,34 @@ pdb$atom[,"resid"]
 aa321(pdb$atom[,"resid"])
 ```
 ```{r}
+ca.inds <-atom.select(pdb, "calpha")
+ca.inds
+```
+First select "protein" then write out a file: "1hsg_protein.pdb"
+```{r}
+#atom.select()
+#write.pdb()
+atom.select(pdb,"ligand", value = TRUE)
+```
+
+```{r}
+atom.select(pdb,"protein", value = TRUE)
+```
+
+```{r}
+protein <- atom.select(pdb,"protein", value = TRUE)
+write.pdb(protein, file="1hsg_protein.pdb")
+```
+
+```{r}
+ligand <- atom.select(pdb,"ligand", value = TRUE)
+write.pdb(ligand, file="1hsg_ligand.pdb")
+```
+
+```{r}
+library(bio3d.view)
+view(lig)
+view(pdb, "overview", col="sse")
 
 ```
 
