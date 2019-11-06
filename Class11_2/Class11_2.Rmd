@@ -1,0 +1,66 @@
+---
+title: "Class11_2"
+author: "Analine Aguayo"
+date: "11/6/2019"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#What is in the PDB 
+
+```
+
+# What is in the PDB database
+
+Download PDB statistics summary sorted by experimental method and molecular type
+
+```{r}
+data <- read.csv("Data Export Summary.csv")
+```
+
+Q. Determine the percentage of structures solved by X-Ray and Electron Microscopy
+ 
+```{r}
+sum(data$Total)
+```
+
+```{r}
+ans <- data$Total/sum(data$Total)*100
+names(ans) <- data$Experimental.Method
+ans
+round(ans,2)
+```
+
+```{r}
+round(sum(data$Proteins)/sum(data$Total)*100,2)
+
+```
+
+```{r}
+library(bio3d)
+pdb <- read.pdb("1hsg")
+pdb
+```
+
+```{r}
+pdb$atom
+```
+```{r}
+pdb$atom[1,"resid"]
+```
+
+```{r}
+pdb$atom[,"resid"]
+```
+
+```{r}
+aa321(pdb$atom[,"resid"])
+```
+```{r}
+
+```
+
