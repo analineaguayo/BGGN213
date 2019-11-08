@@ -48,6 +48,6 @@ atom.select(pdb, "protein", value =TRUE)
 
 protein <- atom.select(pdb, "protein", value =TRUE)
 write.pdb(ligand, file="1hsg_protein.pdb")
-
+ 
 ```
 
