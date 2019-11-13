@@ -139,3 +139,46 @@ which(x==0)
 x <- data.frame(happy=c(5,6,0,0), sad = c(0,5,5,0))
 x ==0
 ```
+```{r}
+which(x==0, arr.ind=TRUE)
+```
+focus on the rows only that have zero entries
+```{r}
+which(x==0, arr.ind=TRUE)[,1]
+
+```
+
+```{r}
+unique(which(x==0, arr.ind=TRUE)[,1]
+)
+```
+
+```{r}
+inds <-unique(which(x==0, arr.ind=TRUE)[,1])
+x[-inds,]
+
+```
+now we are gonna make our neighbor try to understand my new code with different happy and sad numbers
+```{r}
+x <- data.frame(happy=c(5,6,4,0), sad = c(0,0,5,04))
+x ==0
+```
+```{r}
+which(x==0, arr.ind=TRUE)
+```
+
+```{r}
+unique(which(x==0, arr.ind=TRUE)[,1]
+)
+```
+
+```{r}
+x[-inds,]
+```
+
+now do this for our menacounts data, ie remove xero containing fenes from further  consideration.
+```{r}
+to.rm<-unique(which(meancounts[1:2]==0, arr.ind=TRUE)[,1])
+mycounts <- meancounts[-to.rm,]
+head(mycounts)
+```
