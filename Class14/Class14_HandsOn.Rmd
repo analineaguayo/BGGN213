@@ -182,3 +182,49 @@ to.rm<-unique(which(meancounts[1:2]==0, arr.ind=TRUE)[,1])
 mycounts <- meancounts[-to.rm,]
 head(mycounts)
 ```
+how many genes do i have left?
+```{r}
+nrow(mycounts)
+```
+
+A common threshold used for calling something differentially expressed is a log2(FoldChange) of greater than 2 or less than -2. Let’s filter the dataset both ways to see how many genes are up or down-regulated.
+
+
+```{r}
+up.ind <- mycounts$log2fc > 2
+down.ind <- mycounts$log2fc < (-2)
+```
+
+```{r}
+sum(up.ind)
+```
+
+##Annotation
+
+we will use Bioconductor's annotation packages to help with mapping various id schemes to each other. here we load the annotationdbi package and the annotation package org.Hs.eg.db.
+
+```{r}
+library("AnnotationDbi")
+library("org.Hs.eg.db")
+```
+
+```{r}
+columns(org.Hs.eg.db)
+```
+
+```{r}
+mycounts$symbol <- mapIds(org.Hs.eg.db,
+                     keys=row.names(mycounts),
+                     column="SYMBOL",
+                     keytype="ENSEMBL",
+                     multiVals="first")
+```
+
+```{r}
+head(mycounts)
+```
+
+```{r}
+
+```
+
