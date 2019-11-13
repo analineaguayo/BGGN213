@@ -123,4 +123,7 @@ Going to normalize this data by the mean.control
 meancounts$log2fc <- log2(meancounts[,"treated.mean"]/meancounts[,"control.mean"])
 head(meancounts)
 ```
+There are a couple of “weird” results. Namely, the NaN (“not a number”“) and -Inf (negative infinity) results.
+
+The NaN is returned when you divide by zero and try to take the log. The -Inf is returned when you try to take the log of zero. It turns out that there are a lot of genes with zero expression. Let’s filter our data to remove these genes. Again inspect your result (and the intermediate steps) to see if things make sense to you
 
