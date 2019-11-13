@@ -224,7 +224,5 @@ mycounts$symbol <- mapIds(org.Hs.eg.db,
 head(mycounts)
 ```
 
-```{r}
 
-```
 
