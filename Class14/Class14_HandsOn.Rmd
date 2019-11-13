@@ -126,4 +126,16 @@ head(meancounts)
 There are a couple of “weird” results. Namely, the NaN (“not a number”“) and -Inf (negative infinity) results.
 
 The NaN is returned when you divide by zero and try to take the log. The -Inf is returned when you try to take the log of zero. It turns out that there are a lot of genes with zero expression. Let’s filter our data to remove these genes. Again inspect your result (and the intermediate steps) to see if things make sense to you
+```{r}
+#test for finding zwro entries
+x <- c(5,8,0,5)
+x ==0
+```
 
+```{r}
+which(x==0)
+```
+```{r}
+x <- data.frame(happy=c(5,6,0,0), sad = c(0,5,5,0))
+x ==0
+```

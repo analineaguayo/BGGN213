@@ -1,0 +1,105 @@
+---
+title: 'Class 7: R Functions and Packages'
+author: "Analine Aguayo"
+date: "10/23/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##Revisit our functions from last day
+# control alt I puts in an R code
+
+```{r}
+source("http://tinyurl.com/rescale-R")
+```
+
+Let's try our rescale() function from last day
+
+```{r}
+rescale(1:10)
+```
+
+```{r}
+rescale(c(3, 10, NA, 7, "barry"))
+```
+
+```{r}
+rescale2(c(3, 10, NA, 7, "barry"))
+```
+
+##Write a function both_()na
+We want to write a function, called both_na(),
+that counts how many positions in two input
+vectors, x and y, both have a missing value
+
+```{r}
+#from stackOverFlow
+x <- c( 1, 2, NA, 3, NA)
+y <- c(NA, 3, NA, 3, 4)
+
+is.na(x)
+is.na(y)
+```
+
+```{r}
+which( is.na(x))
+```
+
+Working snippet of code
+```{r}
+is.na(x) & is.na(y)
+```
+
+```{r}
+both.na <-function (x,y) {sum(is.na(x) & is.na(y))}
+```
+
+```{r}
+both.na(x,y)
+```
+
+```{r}
+x <- c(NA, NA, NA)
+y1 <- c( 1, NA, NA)
+y2 <- c( 1, NA, NA, NA)
+
+both.na(x,y2)
+```
+
+```{r}
+x <- c(NA, NA, NA)
+y1 <- c( 1, NA, NA)
+y2 <- c( 1, NA, NA, NA)
+y3 <-c(1, NA, NA, NA, NA, NA)
+
+both.na(x,y3)
+```
+
+```{r}
+both.na2<-function (x,y) {
+  if(length(x) != length(y)){
+    stop("Input vectors should be the same length")
+  }
+  sum(is.na(x) & is.na(y))
+  }
+```
+
+```{r}
+
+# student 1
+c(100, 100, 100, 100, 100, 100, 100, 90)
+# student 2
+c(100, NA, 90, 90, 90, 90, 97, 80)
+
+x <- c(100, 100, 100, 100, 100, 100, 100, 90)
+y <- c(100, NA, 90, 90, 90, 90, 97, 80)
+xgrade <- sum(x[-which.min(x)], na.rm=TRUE) / (length(x)-1)
+ygrade <- sum(y[-which.min(y)], na.rm=TRUE) / (length(y)-1)
+xgrade
+ygrade
+grades <- c(xgrade,ygrade)
+grades
+```

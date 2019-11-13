@@ -1,0 +1,184 @@
+---
+title: 'Class 8: Machine Learning'
+author: "Analine Aguayo"
+date: "10/25/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##K-means example
+
+We will make up some data cluster, baby step ;-)
+
+```{r}
+# Generate some example data for clustering 
+tmp <- c(rnorm(30,-3), rnorm(30,3))
+x <- cbind(x=tmp, y=rev(tmp))
+plot(x)
+```
+
+Use the kmeans() function setting k to 2 and nstart=20 
+
+Inspect/print the results 
+Q. How many points are in each cluster?
+
+```{r}
+k$size
+```
+
+Q. What ‘component’ of your result object details       
+      - cluster size?      
+      - cluster assignment/membership?      
+      - cluster center?
+
+Plot x colored by the kmeans cluster assignment and add cluster centers as blue points
+
+```{r}
+k <- kmeans(x, centers = 2, nstart =20)
+```
+
+```{r}
+k
+```
+
+```{r}
+k$cluster
+```
+
+```{r}
+k$centers
+```
+
+```{r}
+
+plot(x, col=k$cluster)
+points(k$centers, col="blue", pch=15)
+```
+```{r}
+
+```
+##hierarchical clustering in R
+```{r}
+hx <- hclust(dist(x))
+hc
+```
+
+
+```{r}
+# First we need to calculate point (dis)similarity
+#   as the Euclidean distance between observations
+dist_matrix <- dist(x)
+
+# The hclust() function returns a hierarchical 
+#  clustering model
+hc <- hclust(d = dist_matrix)
+
+# the print method is not so useful here
+hc
+```
+```{r}
+# Create hierarchical cluster model: hc
+hc <- hclust(dist(x))
+
+# We can plot the results as a dendrogram
+plot(hc)
+# What do you notice?
+# Does the dendrogram
+# make sense based on 
+# your knoweledge of x?
+```
+
+```{r}
+#Draws a dendrogram
+plot(hc)
+abline(h=6, col="red")
+```
+
+```{r}
+plot(hc)
+abline(h=6, col="red")
+cutree(hc, h=6)
+#cut by height h
+```
+```{r}
+plot(hc)
+abline(h=4, col="red")
+cutree(hc, h=4)
+```
+```{r}
+cutree(hc,k=2)
+#this is me cutting the tree to yield a given k groups/clusters
+```
+```{r}
+grps <-cutree(hc,k=2)
+table(grps)
+#this is me cutting the tree to yield a given k groups/clusters
+plot(x, col=grps)
+```
+
+```{r}
+# Our input is a distance matrix from the dist()
+# function. Lets make sure we understand it first
+dist_matrix <- dist(x)
+
+dim(dist_matrix)
+
+View( as.matrix(dist_matrix) )
+dim(x)
+
+dim( as.matrix(dist_matrix) )
+
+# Note. symmetrical pairwise distance matrix
+```
+
+```{r}
+# Step 1. Generate some example data for clustering
+x <- rbind( 
+  matrix(rnorm(100, mean=0, sd = 0.3), ncol = 2),   # c1 
+             matrix(rnorm(100, mean = 1, sd = 0.3), ncol = 2), # c2 
+             matrix(c(rnorm(50, mean = 1, sd = 0.3),           # c3     
+                      rnorm(50, mean = 0, sd = 0.3)), ncol = 2))
+colnames(x) <- c("x", "y")
+```
+```{r}
+# Step 2. Plot the data without clustering
+plot(x)
+```
+
+```{r}
+#Step 3. Generate colors for known clusters 
+#         (just so we can compare to hclust results)
+col <- as.factor( rep(c("c1","c2","c3"), each=50) ) 
+plot(x, col=col)
+```
+```{r}
+dist_matrix <- dist(x)
+
+```
+
+
+```{r}
+hc <-hclust(dist(x))
+plot(hc)
+```
+
+```{r}
+cutree(hc,k=2)
+grps <- cutree(hc,k=2)
+plot(x,col=grps)
+table(col,grps)
+```
+```{r}
+table(grps)
+```
+
+```{r}
+cutree(hc,k=2)
+grps <- cutree(hc,k=3)
+plot(x,col=grps)
+table(col,grps)
+```
+
