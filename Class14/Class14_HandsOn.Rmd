@@ -1,0 +1,126 @@
+---
+title: "ranscriptomics and the analysis of RNA-Seq data"
+author: "Analine Aguayo"
+date: "11/13/2019"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+##Setup Bioconductor DESeq2
+
+```{r eval=FALSE}
+ install.packages("BiocManager")
+ BiocManager::install()
+ BiocManager::install("DESeq2")
+ library(DESeq2)
+```
+```{r}
+library(DESeq2)
+```
+
+
+```{r}
+read.csv("airway_scaledcounts.csv")
+read.csv("airway_metadata.csv")
+```
+
+```{r}
+counts <- read.csv("airway_scaledcounts.csv", stringsAsFactors = F)
+metadata <-  read.csv("airway_metadata.csv", stringsAsFactors = F)
+```
+
+lets take a peak
+```{r}
+head(counts)
+```
+how many genes do we have in the database?
+
+```{r}
+nrow(counts)
+```
+
+how many experiments?
+```{r}
+nrow(counts)
+```
+```{r}
+ncol(counts)-1
+
+```
+
+lets make sure metadata id col matches the colnames of counts
+```{r}
+colnames(counts)[-1]
+```
+```{r}
+metadata$id
+```
+ˆare they the same?
+```{r}
+all(colnames(counts)[-1]==metadata$id)
+```
+
+```{r}
+all(c(T,T,T))
+```
+##Analysis: compare the control to drug treated
+First we need to access the columns of our countData that are control and then find their mean.
+```{r}
+metadata$dex
+```
+
+```{r}
+metadata$dex=="control"
+```
+
+```{r}
+metadata[metadata$dex=="control",]$id
+#these are the blue columns that are the controls
+
+```
+
+```{r}
+control.id <- metadata[metadata$dex=="control",]$id
+control.id
+```
+focus on the countrs for control experiments...
+```{r}
+head(counts[, control.id])
+```
+Mean counts for the control experiments.
+```{r}
+
+control.mean <- rowSums(counts[, control.id])/length(control.id)
+names(control.mean) <- counts$ensgene
+```
+
+```{r}
+treated <- metadata[metadata[,"dex"]=="treated",]
+treated.mean <- rowSums( counts[ ,treated$id] )/4 
+names(treated.mean) <- counts$ensgene
+```
+Lets story these together
+```{r}
+meancounts <- data.frame(control.mean, treated.mean)
+```
+
+Plot control vs mean.
+```{r}
+plot(meancounts$control,meancounts$treated)
+```
+Good case for a log plot
+```{r}
+plot(meancounts$control,meancounts$treated,log="xy")
+
+```
+```{r}
+#in this plot the dots that are on either side of the xy line, mean that there was a differential expression of this gene depending on the group (treatment vs control)
+```
+Going to normalize this data by the mean.control
+```{r}
+meancounts$log2fc <- log2(meancounts[,"treated.mean"]/meancounts[,"control.mean"])
+head(meancounts)
+```
+
