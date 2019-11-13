@@ -22526,3 +22526,370 @@ head(meancounts)
     ## ENSG00000000457       339.75       316.50 -0.10226805
     ## ENSG00000000460        97.25        78.75 -0.30441833
     ## ENSG00000000938         0.75         0.00        -Inf
+
+There are a couple of “weird” results. Namely, the NaN (“not a number”“)
+and -Inf (negative infinity) results.
+
+The NaN is returned when you divide by zero and try to take the log. The
+-Inf is returned when you try to take the log of zero. It turns out that
+there are a lot of genes with zero expression. Let’s filter our data to
+remove these genes. Again inspect your result (and the intermediate
+steps) to see if things make sense to you
+
+``` r
+#test for finding zwro entries
+x <- c(5,8,0,5)
+x ==0
+```
+
+    ## [1] FALSE FALSE  TRUE FALSE
+
+``` r
+which(x==0)
+```
+
+    ## [1] 3
+
+``` r
+x <- data.frame(happy=c(5,6,0,0), sad = c(0,5,5,0))
+x ==0
+```
+
+    ##      happy   sad
+    ## [1,] FALSE  TRUE
+    ## [2,] FALSE FALSE
+    ## [3,]  TRUE FALSE
+    ## [4,]  TRUE  TRUE
+
+``` r
+which(x==0, arr.ind=TRUE)
+```
+
+    ##      row col
+    ## [1,]   3   1
+    ## [2,]   4   1
+    ## [3,]   1   2
+    ## [4,]   4   2
+
+focus on the rows only that have zero entries
+
+``` r
+which(x==0, arr.ind=TRUE)[,1]
+```
+
+    ## [1] 3 4 1 4
+
+``` r
+unique(which(x==0, arr.ind=TRUE)[,1]
+)
+```
+
+    ## [1] 3 4 1
+
+``` r
+inds <-unique(which(x==0, arr.ind=TRUE)[,1])
+x[-inds,]
+```
+
+    ##   happy sad
+    ## 2     6   5
+
+now we are gonna make our neighbor try to understand my new code with
+different happy and sad numbers
+
+``` r
+x <- data.frame(happy=c(5,6,4,0), sad = c(0,0,5,04))
+x ==0
+```
+
+    ##      happy   sad
+    ## [1,] FALSE  TRUE
+    ## [2,] FALSE  TRUE
+    ## [3,] FALSE FALSE
+    ## [4,]  TRUE FALSE
+
+``` r
+which(x==0, arr.ind=TRUE)
+```
+
+    ##      row col
+    ## [1,]   4   1
+    ## [2,]   1   2
+    ## [3,]   2   2
+
+``` r
+unique(which(x==0, arr.ind=TRUE)[,1]
+)
+```
+
+    ## [1] 4 1 2
+
+``` r
+x[-inds,]
+```
+
+    ##   happy sad
+    ## 2     6   0
+
+now do this for our menacounts data, ie remove xero containing fenes
+from further consideration.
+
+``` r
+to.rm<-unique(which(meancounts[1:2]==0, arr.ind=TRUE)[,1])
+mycounts <- meancounts[-to.rm,]
+head(mycounts)
+```
+
+    ##                 control.mean treated.mean      log2fc
+    ## ENSG00000000003       900.75       658.00 -0.45303916
+    ## ENSG00000000419       520.50       546.00  0.06900279
+    ## ENSG00000000457       339.75       316.50 -0.10226805
+    ## ENSG00000000460        97.25        78.75 -0.30441833
+    ## ENSG00000000971      5219.00      6687.50  0.35769358
+    ## ENSG00000001036      2327.00      1785.75 -0.38194109
+
+how many genes do i have left?
+
+``` r
+nrow(mycounts)
+```
+
+    ## [1] 21817
+
+A common threshold used for calling something differentially expressed
+is a log2(FoldChange) of greater than 2 or less than -2. Let’s filter
+the dataset both ways to see how many genes are up or down-regulated.
+
+``` r
+up.ind <- mycounts$log2fc > 2
+down.ind <- mycounts$log2fc < (-2)
+```
+
+``` r
+sum(up.ind)
+```
+
+    ## [1] 250
+
+\#\#Annotation
+
+we will use Bioconductor’s annotation packages to help with mapping
+various id schemes to each other. here we load the annotationdbi package
+and the annotation package org.Hs.eg.db.
+
+``` r
+library("AnnotationDbi")
+library("org.Hs.eg.db")
+```
+
+    ## 
+
+``` r
+columns(org.Hs.eg.db)
+```
+
+    ##  [1] "ACCNUM"       "ALIAS"        "ENSEMBL"      "ENSEMBLPROT" 
+    ##  [5] "ENSEMBLTRANS" "ENTREZID"     "ENZYME"       "EVIDENCE"    
+    ##  [9] "EVIDENCEALL"  "GENENAME"     "GO"           "GOALL"       
+    ## [13] "IPI"          "MAP"          "OMIM"         "ONTOLOGY"    
+    ## [17] "ONTOLOGYALL"  "PATH"         "PFAM"         "PMID"        
+    ## [21] "PROSITE"      "REFSEQ"       "SYMBOL"       "UCSCKG"      
+    ## [25] "UNIGENE"      "UNIPROT"
+
+``` r
+mycounts$symbol <- mapIds(org.Hs.eg.db,
+                     keys=row.names(mycounts),
+                     column="SYMBOL",
+                     keytype="ENSEMBL",
+                     multiVals="first")
+```
+
+    ## 'select()' returned 1:many mapping between keys and columns
+
+``` r
+head(mycounts)
+```
+
+    ##                 control.mean treated.mean      log2fc   symbol
+    ## ENSG00000000003       900.75       658.00 -0.45303916   TSPAN6
+    ## ENSG00000000419       520.50       546.00  0.06900279     DPM1
+    ## ENSG00000000457       339.75       316.50 -0.10226805    SCYL3
+    ## ENSG00000000460        97.25        78.75 -0.30441833 C1orf112
+    ## ENSG00000000971      5219.00      6687.50  0.35769358      CFH
+    ## ENSG00000001036      2327.00      1785.75 -0.38194109    FUCA2
+
+\#DESeq2 Analysis
+
+``` r
+library(DESeq2)
+citation("DESeq2")
+```
+
+    ## 
+    ##   Love, M.I., Huber, W., Anders, S. Moderated estimation of fold
+    ##   change and dispersion for RNA-seq data with DESeq2 Genome
+    ##   Biology 15(12):550 (2014)
+    ## 
+    ## A BibTeX entry for LaTeX users is
+    ## 
+    ##   @Article{,
+    ##     title = {Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2},
+    ##     author = {Michael I. Love and Wolfgang Huber and Simon Anders},
+    ##     year = {2014},
+    ##     journal = {Genome Biology},
+    ##     doi = {10.1186/s13059-014-0550-8},
+    ##     volume = {15},
+    ##     issue = {12},
+    ##     pages = {550},
+    ##   }
+
+``` r
+dds <- DESeqDataSetFromMatrix(countData=counts, 
+                              colData=metadata, 
+                              design=~dex, 
+                              tidy=TRUE)
+```
+
+    ## converting counts to integer mode
+
+    ## Warning in DESeqDataSet(se, design = design, ignoreRank): some variables in
+    ## design formula are characters, converting to factors
+
+``` r
+dds
+```
+
+    ## class: DESeqDataSet 
+    ## dim: 38694 8 
+    ## metadata(1): version
+    ## assays(1): counts
+    ## rownames(38694): ENSG00000000003 ENSG00000000005 ...
+    ##   ENSG00000283120 ENSG00000283123
+    ## rowData names(0):
+    ## colnames(8): SRR1039508 SRR1039509 ... SRR1039520 SRR1039521
+    ## colData names(4): id dex celltype geo_id
+
+``` r
+sizeFactors(dds)
+```
+
+    ## NULL
+
+``` r
+dispersions(dds)
+```
+
+    ## NULL
+
+``` r
+dds <- DESeq(dds)
+```
+
+    ## estimating size factors
+
+    ## estimating dispersions
+
+    ## gene-wise dispersion estimates
+
+    ## mean-dispersion relationship
+
+    ## final dispersion estimates
+
+    ## fitting model and testing
+
+``` r
+res <- results(dds)
+res
+```
+
+    ## log2 fold change (MLE): dex treated vs control 
+    ## Wald test p-value: dex treated vs control 
+    ## DataFrame with 38694 rows and 6 columns
+    ##                          baseMean     log2FoldChange             lfcSE
+    ##                         <numeric>          <numeric>         <numeric>
+    ## ENSG00000000003  747.194195359907 -0.350703020686579 0.168245681332529
+    ## ENSG00000000005                 0                 NA                NA
+    ## ENSG00000000419  520.134160051965  0.206107766417861 0.101059218008052
+    ## ENSG00000000457  322.664843927049 0.0245269479387471 0.145145067649248
+    ## ENSG00000000460   87.682625164828  -0.14714204922212 0.257007253994673
+    ## ...                           ...                ...               ...
+    ## ENSG00000283115                 0                 NA                NA
+    ## ENSG00000283116                 0                 NA                NA
+    ## ENSG00000283119                 0                 NA                NA
+    ## ENSG00000283120 0.974916032393564  -0.66825846051647  1.69456285241871
+    ## ENSG00000283123                 0                 NA                NA
+    ##                               stat             pvalue              padj
+    ##                          <numeric>          <numeric>         <numeric>
+    ## ENSG00000000003   -2.0844696749953 0.0371174658432827 0.163034808641681
+    ## ENSG00000000005                 NA                 NA                NA
+    ## ENSG00000000419    2.0394751758463 0.0414026263001167 0.176031664879168
+    ## ENSG00000000457  0.168982303952746  0.865810560623561 0.961694238404388
+    ## ENSG00000000460  -0.57252099672319  0.566969065257939 0.815848587637724
+    ## ...                            ...                ...               ...
+    ## ENSG00000283115                 NA                 NA                NA
+    ## ENSG00000283116                 NA                 NA                NA
+    ## ENSG00000283119                 NA                 NA                NA
+    ## ENSG00000283120 -0.394354484734893  0.693319342566817                NA
+    ## ENSG00000283123                 NA                 NA                NA
+
+``` r
+summary(res)
+```
+
+    ## 
+    ## out of 25258 with nonzero total read count
+    ## adjusted p-value < 0.1
+    ## LFC > 0 (up)       : 1563, 6.2%
+    ## LFC < 0 (down)     : 1188, 4.7%
+    ## outliers [1]       : 142, 0.56%
+    ## low counts [2]     : 9971, 39%
+    ## (mean count < 10)
+    ## [1] see 'cooksCutoff' argument of ?results
+    ## [2] see 'independentFiltering' argument of ?results
+
+# Volcano Plot
+
+``` r
+plot(res$log2FoldChange, res$padj)
+```
+
+![](Class14_HandsOn_files/figure-gfm/unnamed-chunk-52-1.png)<!-- -->
+
+``` r
+plot(res$log2FoldChange, log(res$padj))
+```
+
+![](Class14_HandsOn_files/figure-gfm/unnamed-chunk-53-1.png)<!-- -->
+
+``` r
+plot(res$log2FoldChange, -log(res$padj))
+```
+
+![](Class14_HandsOn_files/figure-gfm/unnamed-chunk-54-1.png)<!-- -->
+
+``` r
+mycols <- rep("gray", length(res$padj))
+mycols[abs(res$log2FoldChange >2)] = "blue"
+mycols[ res$parj <0.05] = "red"
+plot(res$log2FoldChange, -log(res$padj), col=mycols)
+```
+
+![](Class14_HandsOn_files/figure-gfm/unnamed-chunk-55-1.png)<!-- -->
+
+``` r
+#Setup  your point color vector 
+mycols <-rep("gray", length(res$padj))
+mycols[ abs(res$log2FoldChange) > 2 ]  <- "red"
+
+inds <- (res$padj < 0.01) & (abs(res$log2FoldChange) > 2 )
+mycols[ inds ] <- "blue"
+
+#Volcano plot  with custom colors 
+plot( res$log2FoldChange,  -log(res$padj),
+      col=mycols, ylab="-Log(P-value)",
+      xlab="Log2(FoldChange)" )
+abline(v=c(-2,2), col="gray", lty=2)
+abline(h=-log(0.1), col="gray", lty=2)
+```
+
+![](Class14_HandsOn_files/figure-gfm/unnamed-chunk-56-1.png)<!-- -->
