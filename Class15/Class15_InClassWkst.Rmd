@@ -30,9 +30,174 @@ colData = read.csv(metaFile, row.names=1)
 head(colData)
 ```
 
+Read in count data file
 ```{r}
 # Import countdata
 countData = read.csv(countFile, row.names=1)
 head(countData)
 ```
+ looks like we need to remove the first column in countdata, the "length" col
+```{r}
+countData <- countData[,-1]
+#this gives me everything but the first column
+```
+Remove genes that contain all 0s
+```{r}
+countData <- countData[rowSums(countData) > 0, ]
+countData
 
+```
+```{r}
+nrow(countData)
+```
+ 
+ ##Principal Component Analysis
+ The first analysis step is usually to plot the data but here we have 15K genes. How do we plot this - PCA to the rescue!
+ 
+```{r}
+pc <- prcomp(t(countData))
+plot (pc)
+```
+ 
+```{r}
+summary(pc)
+```
+PCA plot
+```{r}
+plot(pc$x[,1:2])
+```
+were gonna add some color
+
+```{r}
+mycols <- c(rep("blue",3), rep("red",3))
+mycols
+plot(pc$x[,1:2], col=mycols)
+```
+deseq analysis allows us to look at differential analysis
+```{r}
+dds = DESeqDataSetFromMatrix(countData=countData,
+                             colData=colData,
+                             design=~condition)
+dds = DESeq(dds)
+```
+
+```{r}
+res <- results(dds)
+res
+```
+## volcano plot summary
+```{r}
+plot(res$log2FoldChange, -log(res$padj))
+```
+lets add some color
+```{r}
+# Make a color vector for all genes
+mycols <- rep("gray", nrow(res) )
+
+# Color red the genes with absolute fold change above 2
+mycols[ abs(res$log2FoldChange) > 2 ] <- "red"
+
+# Color blue those with adjusted p-value less than 0.01
+#  and absolute fold change more than 2
+inds <- (res$padj <0.05) & (abs(res$log2FoldChange) > 2 )
+mycols[ inds ] <- "blue"
+
+plot( res$log2FoldChange, -log(res$padj), col=mycols, xlab="Log2(FoldChange)", ylab="-Log(P-value)" )
+```
+
+
+```{r}
+library("AnnotationDbi")
+library("org.Hs.eg.db")
+
+columns(org.Hs.eg.db)
+
+res$symbol = mapIds(org.Hs.eg.db,
+                    keys=row.names(res), #where are you gene ids?
+                    keytype="ENSEMBL",#what format are you ids?
+                    column="SYMBOL", #what new id format do you want?
+                    multiVals="first")
+
+res$entrez = mapIds(org.Hs.eg.db,
+                    keys=row.names(res),
+                    keytype="ENSEMBL",
+                    column="ENTREZID",
+                    multiVals="first")
+
+
+```
+
+```{r}
+head(res)
+```
+##pathway analysis
+
+we need to load the packages we need for this section
+
+```{r}
+#BiocManager::install( c("pathview", "gage", "gageData") )
+```
+
+```{r}
+library(pathview)
+library(gage)
+library(gageData)
+
+data(kegg.sets.hs)
+data(sigmet.idx.hs)
+
+# Focus on signaling and metabolic pathways only
+kegg.sets.hs = kegg.sets.hs[sigmet.idx.hs]
+
+# Examine the first 3 pathways
+head(kegg.sets.hs, 3)
+
+```
+The main gage() function requires a named vector of fold changes, where the names of the values are the Entrez gene IDs.
+
+Note that we used the mapIDs() function above to obtain Entrez gene IDs (stored in res$entrez) and we have the fold change results from DESeq2 analysis (stored in res$log2FoldChange).
+```{r}
+foldchanges = res$log2FoldChange
+names(foldchanges) = res$entrez
+head(foldchanges)
+```
+Now lets run the gage function
+```{r}
+# Get the results
+keggres = gage(foldchanges, gsets=kegg.sets.hs)
+keggres
+```
+See help on the gage function with ?gage. Specifically, you might want to try changing the value of same.dir. This value determines whether to test for changes in a gene set toward a single direction (all genes up or down regulated) or changes towards both directions simultaneously (i.e. any genes in the pathway dysregulated). Here, we're using the default same.dir=TRUE, which will give us separate lists for pathways that are upregulated versus pathways that are down-regulated.
+
+Now lets look at the object returned from gage().
+
+```{r}
+attributes(keggres)
+```
+It is a list with three elements, "greater", "less" and "stats".
+
+You can also see this in your Environmnet panel/tab window of RStudio or use the R command str(keggres).
+
+Like any list we can use the dollar syntax to access a named element, e.g. head(keggres$greater) and head(keggres$less).
+
+Lets look at the first few down (less) pathway results:
+
+```{r}
+# Look at the first few down (less) pathways
+(keggres$less)
+head(keggres$less)
+```
+Each keggres$less and keggres$greater object is data matrix with gene sets as rows sorted by p-value.
+
+The top "less/down" pathways is "Cell cycle" with the KEGG pathway identifier hsa04110.
+
+Now, let's try out the pathview() function from the pathview package to make a pathway plot with our RNA-Seq expression results shown in color.
+To begin with lets manually supply a pathway.id (namely the first part of the "hsa04110 Cell cycle") that we could see from the print out above.
+```{r}
+pathview(gene.data=foldchanges, pathway.id="hsa04110")
+```
+```{r}
+#"hsa04110.pathview.png"
+```
+
+![My first pathway](./hsa04110.pathview.png)
