@@ -75,3 +75,36 @@ styles
 plot(g)
 ```
 
+```{r}
+## scripts for processing located in "inst/data-raw/"
+prok_vir_cor <- read.delim("virus_prok_cor_abundant.tsv", stringsAsFactors = FALSE)
+
+## Have a peak at the first 6 rows
+head(prok_vir_cor)
+```
+
+```{r}
+g <- graph.data.frame(prok_vir_cor, directed = FALSE)
+g
+```
+```{r}
+class(g)
+```
+
+```{r}
+g
+```
+
+```{r}
+plot(g)
+```
+
+```{r}
+#lets turn off the blue labels
+plot(g, vertex.label=NA)
+```
+
+```{r}
+plot(g, vertex.size=3, vertex.label=NA)
+```
+
