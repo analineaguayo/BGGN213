@@ -1,0 +1,114 @@
+---
+title: "Class18 Handout 1"
+author: "Analine Aguayo"
+date: "11/27/2019"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The are four main sets of metadata that we can query, namely projects(), cases(), files(), and annotations(). We will start with projects()
+```{r}
+projects <- getGDCprojects()
+head(projects)
+```
+If you use the View(projects) function call you can see all the project names (such as Neuroblastoma, Pancreatic Adenocarcinoma, etc.) along with their project IDs (such as TARGET-NBL, TCGA-PAAD, etc.) and associated information.
+
+Moving onto cases() we can use an example from the package associated publication to answer our first from question above (i.e. find the number of cases/patients across different projects within the GDC):
+```{r}
+cases_by_project <- cases() %>%
+  facet("project.project_id") %>%
+  aggregations()
+head(cases_by_project)
+```
+
+Healthy Tissue <- c(
+MEEPQSDPSVEPPLSQETFSDLWKLLPENNVLSPLPSQAMDDLMLSPDDIEQWFTEDPGP
+DEAPRMPEAAPPVAPAPAAPTPAAPAPAPSWPLSSSVPSQKTYQGSYGFRLGFLHSGTAK
+SVTCTYSPALNKMFCQLAKTCPVQLWVDSTPPPGTRVRAMAIYKQSQHMTEVVRRCPHHE
+RCSDSDGLAPPQHLIRVEGNLRVEYLDDRNTFRHSVVVPYEPPEVGSDCTTIHYNYMCNS
+SCMGGMNRRPILTIITLEDSSGNLLGRNSFEVRVCACPGRDRRTEEENLRKKGEPHHELP
+PGSTKRALPNNTSSSPQPKKKPLDGEYFTLQIRGRERFEMFRELNEALELKDAQAGKEPG
+GSRAHSSHLKSKKGQSTSRHKKLMFKTEGPDSD)
+```{r}
+library(bio3d)
+```
+
+```{r}
+read.fasta("lecture18_sequences.fa")
+```
+```{r}
+seqs <- read.fasta("lecture18_sequences.fa")
+seqs
+```
+
+```{r}
+as.fasta(seqs)
+```
+Next we calculate identity per equivalent (i.e. aligned) position and then use this information to find non identical sites that do not contain gaps (i.e. indels).
+```{r}
+## Calculate positional identity scores
+ide <- conserv(seqs$ali, method="identity")
+mutant.sites <- which(ide < 1) 
+mutant.sites
+```
+
+```{r}
+## Exclude gap possitions from analysis
+gaps <- gap.inspect(seqs)
+mutant.sites <- mutant.sites[mutant.sites %in% gaps$f.inds]
+
+mutant.sites
+```
+
+We can use these indices in mutant.sites to extract subsequences as required for the hands-on session. First however we come up with suitable names for these subsequences based on the mutation. This will help us later to make sense and keep track of our results.
+```{r}
+## Make a "names" label for our output sequences (one per mutant)
+mutant.names <- paste0(seqs$ali["P53_wt",mutant.sites],
+                       mutant.sites,
+                       seqs$ali["P53_mutant",mutant.sites])
+
+mutant.names
+
+```
+
+Now lets extract all 9-mer mutant encompassing sequences for each mutant site. This is equivalent to finding the sequence region eight residues before and eight residues after our mutation sites and outputting this subsequence to a new FASTA file.
+```{r}
+## Sequence positions surounding each mutant site
+start.position <- mutant.sites - 8
+end.position <-  mutant.sites + 8
+start.position
+end.position
+```
+
+```{r}
+# Blank matrix to store sub-sequences
+store.seqs <- matrix("-", nrow=length(mutant.sites), ncol=17)
+rownames(store.seqs) <- mutant.names
+
+```
+```{r}
+## Extract each sub-sequence
+for(i in 1:length(mutant.sites)) {
+  store.seqs[i,] <- seqs$ali["P53_mutant",start.position[i]:end.position[i]]
+}
+
+store.seqs
+```
+Finally lets output all these sequences to a FASTA file for further analysis with the IEDB HLA binding prediction website http://tools.iedb.org/mhci/.
+
+```{r}
+## First blank out the gap positions 
+store.seqs[store.seqs == "-"] <- ""
+
+## Output a FASTA file for further analysis
+write.fasta(seqs=store.seqs, ids=mutant.names, file="subsequences.fa")
+
+```
+
+```{r}
+read.fasta("subsequences.fa")
+```
+
