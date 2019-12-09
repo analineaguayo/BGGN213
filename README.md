@@ -6,7 +6,7 @@ Contents:
 -Class 06 [R Functions](https://github.com/analineaguayo/BGGN213/blob/master/Class06_HandsOn%20copy/Class06_Homework_Aguayo.md)
 -Class 07 [CRAN and Bioconductor](https://github.com/analineaguayo/BGGN213/blob/master/Class07.md)
 -Class 08 [Machine Learning](https://github.com/analineaguayo/BGGN213/blob/master/Class08_20181025.md)
--Class 09 [Unsupervised Machine Learning] ()
+-Class 09 [Unsupervised Machine Learning](https://github.com/analineaguayo/BGGN213/blob/master/Class09_HandsOnWorksheet.md)
 -Class 11 [Structural Bioinformatics]
 -Class 12 [Structural Bioinformatics II]
 -Class 13 [Genome Informatics]
