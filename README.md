@@ -7,7 +7,7 @@ Contents:
 -Class 07 [CRAN and Bioconductor](https://github.com/analineaguayo/BGGN213/blob/master/Class07.md)
 -Class 08 [Machine Learning](https://github.com/analineaguayo/BGGN213/blob/master/Class08_20181025.md)
 -Class 09 [Unsupervised Machine Learning](https://github.com/analineaguayo/BGGN213/blob/master/Class09_HandsOnWorksheet.md)
--Class 11 [Structural Bioinformatics]
+-Class 11 [Structural Bioinformatics](https://github.com/analineaguayo/BGGN213/blob/master/Class11_2.md)
 -Class 12 [Structural Bioinformatics II]
 -Class 13 [Genome Informatics]
 -Class 14 [Genome Informatics II]
