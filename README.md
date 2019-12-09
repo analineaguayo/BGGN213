@@ -10,7 +10,7 @@ Contents:
 -Class 11 [Structural Bioinformatics](https://github.com/analineaguayo/BGGN213/blob/master/Class11_2.md)
 -Class 12 [Structural Bioinformatics II](https://github.com/analineaguayo/BGGN213/blob/master/Class%2012/Class12_InClass_First.md)
 -Class 14 [Genome Informatics II](https://github.com/analineaguayo/BGGN213/blob/master/Class14/Class14_HandsOn.md) 
--CLass 15 [Gene Lists]
+-CLass 15 [Gene Lists](https://github.com/analineaguayo/BGGN213/blob/master/Class15/Class15_InClassWkst.md)
 -Class 16 [UNIX]
 -Class 17 [Network Analysis]
 -CLass 18 [Cancer Genomics]
