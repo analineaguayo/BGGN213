@@ -12,5 +12,5 @@ Contents:
 -Class 14 [Genome Informatics II](https://github.com/analineaguayo/BGGN213/blob/master/Class14/Class14_HandsOn.md) 
 -CLass 15 [Gene Lists](https://github.com/analineaguayo/BGGN213/blob/master/Class15/Class15_InClassWkst.md)
 -Class 16 [UNIX]
--Class 17 [Network Analysis]
+-Class 17 [Network Analysis](https://github.com/analineaguayo/BGGN213/blob/master/Class%2017/Class17_Pt2_20191120.md)
 -CLass 18 [Cancer Genomics]
