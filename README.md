@@ -4,7 +4,7 @@ This is my work from [BGGN213 at UC San Diego](https://bioboot.github.io/bggn213
 Contents:
 -Class 05 [R Graphics](https://github.com/analineaguayo/BGGN213/blob/master/Class5markdown.md)
 -Class 06 [R Functions](https://github.com/analineaguayo/BGGN213/blob/master/Class06_HandsOn%20copy/Class06_Homework_Aguayo.md)
--Class 07 [CRAN and Bioconductor] ()
+-Class 07 [CRAN and Bioconductor](https://github.com/analineaguayo/BGGN213/blob/master/Class07.md)
 -Class 08 [Machine Learning] ()
 -Class 09 [Unsupervised Machine Learning] ()
 -Class 11 [Structural Bioinformatics]
