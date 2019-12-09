@@ -9,7 +9,7 @@ Contents:
 -Class 09 [Unsupervised Machine Learning](https://github.com/analineaguayo/BGGN213/blob/master/Class09_HandsOnWorksheet.md)
 -Class 11 [Structural Bioinformatics](https://github.com/analineaguayo/BGGN213/blob/master/Class11_2.md)
 -Class 12 [Structural Bioinformatics II](https://github.com/analineaguayo/BGGN213/blob/master/Class%2012/Class12_InClass_First.md)
--Class 14 [Genome Informatics II] 
+-Class 14 [Genome Informatics II](https://github.com/analineaguayo/BGGN213/blob/master/Class14/Class14_HandsOn.md) 
 -CLass 15 [Gene Lists]
 -Class 16 [UNIX]
 -Class 17 [Network Analysis]
